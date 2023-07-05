@@ -49,6 +49,7 @@ class ResourceManager:
             path = self.path / res_group.id / f'{obj.resource_id}.gif'
         else:
             return None
+
         if path.exists():
             return Image.open(path)
         else:
