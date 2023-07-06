@@ -1,5 +1,6 @@
 from manager import manager
-from object import GameObject, ResourceGroup, ResourceType
+from object import GameObject
+from resource import ResourceGroup, ResourceType
 
 manager.register_type(GameObject)
 
