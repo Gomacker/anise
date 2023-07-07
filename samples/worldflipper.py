@@ -15,11 +15,23 @@ def _url_getter_worldflipper(suffix: str):
 
 
 class Icon(GameObject):
+
     @classmethod
     def type_id(cls) -> str:
         return 'worldflipper/icon'
 
-    RES = ResourceGroupNetwork('', ResourceTypeImage, _url_getter_worldflipper('png'))
+    class Res:
+        base = ResourceGroupNetwork('', ResourceTypeImage, _url_getter_worldflipper('png'))
+
+
+class Element(GameObject):
+
+    @classmethod
+    def type_id(cls) -> str:
+        return 'worldflipper/element'
+
+    class Res:
+        pass
 
 
 class Character(GameObject):
@@ -36,15 +48,29 @@ class Character(GameObject):
         pixelart__special = ResourceGroupLocal('pixelart/special', ResourceTypeImage, 'gif')
         pixelart__walk_front = ResourceGroupLocal('pixelart/walk_front', ResourceTypeImage, 'gif')
 
+    name_zh: str
+    name_jp: str
+    rarity: int
+    abilities: list[str]
+
 
 class Equipment(GameObject):
-    pass
+    @classmethod
+    def type_id(cls) -> str:
+        return 'worldflipper/equipment'
+
+    class Res:
+        pass
 
 
 if __name__ == '__main__':
     async def main():
-        img: Image.Image = await Icon('fire').res(Icon.RES)
+        img: Image.Image = await Icon('fire').res(Icon.Res.base)
         img.show()
+
+
+    icon = Icon('fire')
+    print(icon.model_dump())
     loop = asyncio.new_event_loop()
     loop.run_until_complete(main())
     asyncio.set_event_loop(loop)
