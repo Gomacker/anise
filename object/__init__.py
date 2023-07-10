@@ -8,10 +8,10 @@ from pydantic import BaseModel
 class GameObject(BaseModel):
     resource_id: str
 
-    def __init__(self, resource_id: str = '', **data: Any):
-        data['resource_id'] = resource_id
+    def __init__(self, resource_id: str = None, **data: Any):
+        if resource_id:
+            data['resource_id'] = resource_id
         super().__init__(**data)
-        # self.resource_id: str = resource_id
 
     @classmethod
     @abc.abstractmethod

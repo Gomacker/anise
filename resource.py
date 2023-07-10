@@ -85,6 +85,7 @@ class ResourceGroupNetworkCacheable(ResourceGroupNetwork):
         #     a = await super().get(obj)
         #     io.BytesIO(bytes(a))
 
+
 if __name__ == '__main__':
     async def main():
         class TestObject(GameObject):
