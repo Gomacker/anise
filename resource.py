@@ -2,7 +2,7 @@ import abc
 import asyncio
 import io
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, IO
 
 import httpx
 from PIL import Image
@@ -11,7 +11,7 @@ from config import RES_PATH, MAIN_URL
 from object import GameObject
 
 
-class ResourceType(abc.ABCMeta):
+class ResourceType(metaclass=abc.ABCMeta):
     @classmethod
     @abc.abstractmethod
     async def read(cls, bytes_: bytes) -> Any:
@@ -19,21 +19,28 @@ class ResourceType(abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    async def write(cls, bytes_: bytes, path: Path) -> None:
+    async def write(cls, obj: Any, io_: IO) -> None:
         """保存数据"""
 
 
 class ResourceTypeImage(ResourceType):
-
     @classmethod
-    @abc.abstractmethod
     async def read(cls, bytes_: bytes) -> Image.Image:
         return Image.open(io.BytesIO(bytes_))
 
     @classmethod
-    @abc.abstractmethod
+    async def write(cls, img: Image.Image, io_: IO) -> None:
+        img.save(io_)
+
+
+class ResourceTypeJson(ResourceType):
+    @classmethod
+    async def read(cls, bytes_: bytes) -> Any:
+        pass
+
+    @classmethod
     async def write(cls, bytes_: bytes, path: Path) -> None:
-        path.write_bytes(bytes_)
+        pass
 
 
 class ResourceGroup:
@@ -93,8 +100,12 @@ if __name__ == '__main__':
             def type_id(cls) -> str:
                 return 'worldflipper/icon'
 
-        img: Image.Image = await ResourceGroupNetwork('', ResourceTypeImage, lambda id_, obj: f'{MAIN_URL.removesuffix("/")}/static/{obj.type_id()}/{id_}/{obj.resource_id}.png').get(TestObject('fire'))
+        img: Image.Image = await ResourceGroupNetwork('', ResourceTypeImage, lambda id_,
+                                                                                    obj: f'{MAIN_URL.removesuffix("/")}/static/{obj.type_id()}/{id_}/{obj.resource_id}.png').get(
+            TestObject('fire'))
         img.show()
+
+
     loop = asyncio.new_event_loop()
     loop.run_until_complete(main())
     asyncio.set_event_loop(loop)
