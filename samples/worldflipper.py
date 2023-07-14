@@ -5,9 +5,9 @@ from enum import Enum
 from PIL import Image
 from pydantic import BaseModel
 
-from config import MAIN_URL
-from object import GameObject
-from resource import ResourceGroupLocal, ResourceTypeImage, ResourceGroupNetwork
+from ..config import MAIN_URL
+from ..object import GameObject
+from ..resource import ResourceGroupLocal, ResourceTypeImage, ResourceGroupNetwork
 
 
 def _url_getter_worldflipper(suffix: str):
@@ -66,6 +66,11 @@ class Race(Enum):
 #     UNKNOWN = 2
 
 
+class LeaderAbilityInfo(BaseModel):
+    name: str
+    description: str
+
+
 class SkillBase(BaseModel):
     name: str
     weight: int
@@ -95,10 +100,12 @@ class Character(GameObject):
     rarity: int
     element: Element
     type: SpecialityType
-    race: list[Race]
+    # race: list[Race]
+    race: str
     # gender: Gender
     gender: str  # 因为莉莉的原因，暂时不做枚举
 
+    leader_ability: LeaderAbilityInfo
     skill: SkillBase
 
     abilities: list[str]
