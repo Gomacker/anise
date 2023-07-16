@@ -1,11 +1,12 @@
 import asyncio
+import json
 import urllib.parse
 from enum import Enum
 
 from PIL import Image
 from pydantic import BaseModel
 
-from ..config import MAIN_URL
+from ..config import MAIN_URL, DATA_PATH
 from ..object import GameObject
 from ..resource import ResourceGroupLocal, ResourceTypeImage, ResourceGroupNetwork
 
@@ -105,10 +106,13 @@ class Character(GameObject):
     # gender: Gender
     gender: str  # 因为莉莉的原因，暂时不做枚举
 
+    status_data: str
+
     leader_ability: LeaderAbilityInfo
     skill: SkillBase
 
     abilities: list[str]
+    cv: str
     description: str
     obtain: str
     tags: list[str]
@@ -122,6 +126,29 @@ class Equipment(GameObject):
     class Res:
         pass
 
+
+class Manager:
+    def __init__(self):
+        self.characters: dict[str, Character] = {}
+        self.equipments: dict[str, Equipment] = {}
+        self.init()
+
+    def init(self):
+        self.characters = {
+            k: Character.model_validate(v) for k, v in
+            json.loads((self.data_path / 'character.json').read_text('utf-8')).items()
+        }
+        self.equipments = {
+            k: Equipment.model_validate(v) for k, v in
+            json.loads((self.data_path / 'equipment.json').read_text('utf-8')).items()
+        }
+
+    @property
+    def data_path(self):
+        return DATA_PATH / 'object'
+
+
+manager = Manager()
 
 if __name__ == '__main__':
     async def main():
