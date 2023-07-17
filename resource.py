@@ -8,8 +8,8 @@ from typing import Any, Callable, IO
 import httpx
 from PIL import Image
 
-from config import RES_PATH, MAIN_URL
-from object import GameObject
+from .config import RES_PATH, MAIN_URL
+from .object import GameObject
 
 
 class ResourceType(metaclass=abc.ABCMeta):
@@ -73,12 +73,12 @@ class ResourceGroupNetwork(ResourceGroup):
         super().__init__(id_, type_)
         self.url_getter = url_getter
 
-    async def get(self, obj: GameObject) -> Any:
+    async def get(self, obj: GameObject, timeout: float = 30.0) -> Any:
         url = self.url_getter(self.id, obj)
         if not url:
             return None
         async with httpx.AsyncClient() as client:
-            r = await client.get(url)
+            r = await client.get(url, timeout=timeout)
         return await self.type.read(r.content)
 
 
@@ -87,7 +87,7 @@ class ResourceGroupNetworkCacheable(ResourceGroupNetwork):
         super().__init__(id_, type_, url_getter)
         self.suffix = suffix
 
-    async def get(self, obj: GameObject) -> Any:
+    async def get(self, obj: GameObject, timeout: float = 30.0) -> Any:
         path = RES_PATH / obj.type_id() / self.id / f'{obj.resource_id}.{self.suffix}'
         # if not path.exists():
         #     a = await super().get(obj)
@@ -101,9 +101,11 @@ if __name__ == '__main__':
             def type_id(cls) -> str:
                 return 'worldflipper/icon'
 
-        img: Image.Image = await ResourceGroupNetwork('', ResourceTypeImage, lambda id_,
-                                                                                    obj: f'{MAIN_URL.removesuffix("/")}/static/{obj.type_id()}/{id_}/{obj.resource_id}.png').get(
-            TestObject('fire'))
+        img: Image.Image = await ResourceGroupNetwork(
+            '',
+            ResourceTypeImage,
+            lambda id_, obj: f'{MAIN_URL.removesuffix("/")}/static/{obj.type_id()}/{id_}/{obj.resource_id}.png'
+        ).get(TestObject('fire'))
         img.show()
 
 
