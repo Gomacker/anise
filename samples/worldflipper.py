@@ -123,6 +123,17 @@ class Equipment(GameObject):
     def type_id(cls) -> str:
         return 'worldflipper/equipment'
 
+    names: list[str]
+    rarity: int
+    element: Element
+    status_data: str
+
+    abilities: list[str]
+
+    description: str
+    obtain: str
+    tags: list[str]
+
     class Res:
         pass
 
