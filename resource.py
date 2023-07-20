@@ -1,6 +1,7 @@
 import abc
 import asyncio
 import io
+import json
 from pathlib import Path
 from typing import Any, Callable, IO
 
@@ -39,8 +40,8 @@ class ResourceTypeJson(ResourceType):
         pass
 
     @classmethod
-    async def write(cls, bytes_: bytes, path: Path) -> None:
-        pass
+    async def write(cls, obj: dict, io_: IO) -> None:
+        io_.write(json.dumps(obj).encode())
 
 
 class ResourceGroup:
