@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class GameObject(BaseModel):
-    resource_id: str
+    resource_id: str = ''
 
     def __init__(self, resource_id: str = None, **data: Any):
         if resource_id:
